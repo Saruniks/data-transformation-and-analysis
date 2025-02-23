@@ -120,7 +120,7 @@ function main() {
 
         const putTracksCmd = new PutObjectCommand({
             Bucket: BUCKET_NAME,
-            Key: 'tracks.csv',
+            Key: 'transformedTracks.csv',
             Body: stringify(transformedFilteredTracks, { header: true }),
             ContentType: 'text/csv',
         });
@@ -129,7 +129,7 @@ function main() {
 
         const putArtistsCmd = new PutObjectCommand({
             Bucket: BUCKET_NAME,
-            Key: 'artists.csv',
+            Key: 'transformedArtists.csv',
             Body: stringify(filteredArtists, { header: true }),
             ContentType: 'text/csv',
         });
