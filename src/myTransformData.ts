@@ -27,6 +27,7 @@ function parseCSVFile(filePath: string) {
 
 interface Track {
     name: string;
+    duration_ms: number;
     // [key: string]: unknown;
 }
 
@@ -43,6 +44,7 @@ function main() {
         // Simplicity over memory usage and performance
         const filteredTracks = tracks.filter((t) => {
             if (!t.name) return false;
+            if (t.duration_ms < 60000) return false;
             return true;
         });
 
