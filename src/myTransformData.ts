@@ -34,6 +34,7 @@ interface Track {
     duration_ms: number;
     id_artists: string;
     release_date: string;
+    danceability: number;
     // [key: string]: unknown;
 }
 
@@ -83,11 +84,28 @@ function main() {
 
             logger.trace('Parsed date:', year, month, day);
 
+            logger.trace('Danceability:', t.danceability);
+
+            // Use enum? and function
+            let danceability: string;
+            if (t.danceability < 0.5) {
+                danceability = 'Low';
+            } else if (t.danceability <= 0.6) {
+                danceability = 'Medium';
+            } else if (t.danceability <= 1) {
+                danceability = 'High';
+            } else {
+                throw new Error('Danceability is out of range');
+            }
+
+            logger.trace('Danceability:', danceability);
+
             return {
                 ...rest,
                 year,
                 month,
-                day
+                day,
+                danceability,
             };
         })
 
@@ -107,3 +125,4 @@ main();
 // test nr 3: are array of artists_id parsed correctly
 // test nr 4: proper artist id filtering? So many filtered out...
 // test nr 5: if date was parsed correctly, date + 0, month + 1?
+// test nr 6: check danceability on interval ends
