@@ -25,22 +25,30 @@ function parseCSVFile(filePath: string) {
     });
 }
 
+interface Track {
+    name: string;
+    // [key: string]: unknown;
+}
+
+
 function main() {
     try {
         const artists = parseCSVFile(artistsFilePath);
         logger.debug('Example artists row:', artists[0]);
 
-        const tracks = parseCSVFile(tracksFilePath);
+        const tracks: Track[] = parseCSVFile(tracksFilePath);
         logger.debug('Example tracks row:', tracks[0]);
 
-        tracks.filter((t) => {
+
+        // Simplicity over memory usage and performance
+        const filteredTracks = tracks.filter((t) => {
             if (!t.name) return false;
             return true;
         });
 
         const tracksCopy = path.resolve(__dirname, '../data/tracksCopy.csv');
         const artistsCopy = path.resolve(__dirname, '../data/artistsCopy.csv');
-        fs.writeFileSync(tracksCopy, stringify(tracks, { header: true }));
+        fs.writeFileSync(tracksCopy, stringify(filteredTracks, { header: true }));
         fs.writeFileSync(artistsCopy, stringify(artists, { header: true }));
     } catch (err) {
         logger.error(err);
@@ -50,3 +58,4 @@ function main() {
 main();
 
 // test nr 1: test if has no name for example
+// test nr 2: proper duration filtering
