@@ -75,6 +75,7 @@ function main() {
         const transformedFilteredTracks = filteredTracks.map((t) => {
             logger.trace('Release date:', t.release_date);
 
+            const { release_date, ...rest } = t;
             const dateParts = t.release_date.split('-');
             const year = parseInt(dateParts[0], 10);
             const month = dateParts[1] ? parseInt(dateParts[1], 10) : null;
@@ -83,6 +84,7 @@ function main() {
             logger.trace('Parsed date:', year, month, day);
 
             return {
+                ...rest,
                 year,
                 month,
                 day
