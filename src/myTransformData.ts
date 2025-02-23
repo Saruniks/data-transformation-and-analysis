@@ -3,6 +3,10 @@ import path from 'path';
 import log4js from 'log4js';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+const s3 = new S3Client({ region: 'us-east-1' });
+const BUCKET_NAME = 'my-spotify-transformed-data-bucket';
 
 const tracksFilePath = path.resolve(__dirname, '../data/tracks.csv');
 const artistsFilePath = path.resolve(__dirname, '../data/artists.csv');
@@ -113,6 +117,24 @@ function main() {
         const artistsCopy = path.resolve(__dirname, '../data/artistsCopy.csv');
         fs.writeFileSync(tracksCopy, stringify(transformedFilteredTracks, { header: true }));
         fs.writeFileSync(artistsCopy, stringify(filteredArtists, { header: true }));
+
+        const putTracksCmd = new PutObjectCommand({
+            Bucket: BUCKET_NAME,
+            Key: 'tracks.csv',
+            Body: stringify(transformedFilteredTracks, { header: true }),
+            ContentType: 'text/csv',
+        });
+
+        s3.send(putTracksCmd);
+
+        const putArtistsCmd = new PutObjectCommand({
+            Bucket: BUCKET_NAME,
+            Key: 'artists.csv',
+            Body: stringify(filteredArtists, { header: true }),
+            ContentType: 'text/csv',
+        });
+
+        s3.send(putArtistsCmd);
     } catch (err) {
         logger.error(err);
     }
