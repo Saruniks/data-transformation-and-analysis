@@ -33,7 +33,14 @@ interface Track {
     name: string;
     duration_ms: number;
     id_artists: string;
+    release_date: string;
     // [key: string]: unknown;
+}
+
+interface TransformedTrack {
+    year: number;
+    month?: number;
+    day?: number;
 }
 
 
@@ -56,7 +63,7 @@ function main() {
         filteredTracks.forEach((t) => {
             logger.trace('id_artists:', t.id_artists);
             const artistsIds = JSON.parse(t.id_artists.replace(/'/g, '"'));
-            logger.trace('parsed id_artists:', artistsIds);
+            logger.trace('Parsed id_artists:', artistsIds);
 
             artistsIds.forEach((id: string) => {
                 logger.trace('id: ', id);
@@ -65,9 +72,26 @@ function main() {
         });
         const filteredArtists = artists.filter((a) => artistsSet.has(a.id));
 
+        const transformedFilteredTracks = filteredTracks.map((t) => {
+            logger.trace('Release date:', t.release_date);
+
+            const dateParts = t.release_date.split('-');
+            const year = parseInt(dateParts[0], 10);
+            const month = dateParts[1] ? parseInt(dateParts[1], 10) : null;
+            const day = dateParts[1] ? parseInt(dateParts[2], 10) : null;
+
+            logger.trace('Parsed date:', year, month, day);
+
+            return {
+                year,
+                month,
+                day
+            };
+        })
+
         const tracksCopy = path.resolve(__dirname, '../data/tracksCopy.csv');
         const artistsCopy = path.resolve(__dirname, '../data/artistsCopy.csv');
-        fs.writeFileSync(tracksCopy, stringify(filteredTracks, { header: true }));
+        fs.writeFileSync(tracksCopy, stringify(transformedFilteredTracks, { header: true }));
         fs.writeFileSync(artistsCopy, stringify(filteredArtists, { header: true }));
     } catch (err) {
         logger.error(err);
@@ -80,3 +104,4 @@ main();
 // test nr 2: proper duration filtering
 // test nr 3: are array of artists_id parsed correctly
 // test nr 4: proper artist id filtering? So many filtered out...
+// test nr 5: if date was parsed correctly, date + 0, month + 1?
