@@ -12,7 +12,6 @@ async function main() {
             throw new Error("Required CSV files (artists.csv and tracks.csv) not found in the dataset.");
         }
 
-        // Parse the CSV buffers concurrently
         const [artists, tracks] = await Promise.all([
             parseCSVBuffer(files['artists.csv']),
             parseCSVBuffer(files['tracks.csv'])
