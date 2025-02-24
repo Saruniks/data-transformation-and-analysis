@@ -1,13 +1,7 @@
-import path from 'path';
-import logger from './logger';
-import { Artist, Track } from './types';
-import { parseCSVFile } from './parseCSVFile';
-import { uploadAsCSVFileToS3 } from './uploadToS3';
+import logger from "./logger";
+import { Artist, Track } from "./types";
 
-const tracksFilePath = path.resolve(__dirname, '../data/tracks.csv');
-const artistsFilePath = path.resolve(__dirname, '../data/artists.csv');
-
-function filterTracks(tracks: Track[]): Track[] {
+export function filterTracks(tracks: Track[]): Track[] {
     return tracks.filter((t) => {
         if (!t.name) return false;
         if (t.duration_ms < 60000) return false;
@@ -15,7 +9,7 @@ function filterTracks(tracks: Track[]): Track[] {
     });
 }
 
-function transformTracks(tracks: Track[]) /* TODO: use type */ {
+export function transformTracks(tracks: Track[]) {
     return tracks.map((t) => {
         logger.trace('Release date:', t.release_date);
 
@@ -52,7 +46,7 @@ function transformTracks(tracks: Track[]) /* TODO: use type */ {
     })
 }
 
-function filterArtists(artists: Artist[], tracks: Track[]): Artist[] {
+export function filterArtists(artists: Artist[], tracks: Track[]): Artist[] {
     const artistsSet = new Set();
     tracks.forEach((t) => {
         logger.trace('id_artists:', t.id_artists);
@@ -66,29 +60,6 @@ function filterArtists(artists: Artist[], tracks: Track[]): Artist[] {
     });
     return artists.filter((a) => artistsSet.has(a.id));
 }
-
-function main() {
-    try {
-        const artists: Artist[] = parseCSVFile(artistsFilePath);
-        logger.trace('Example artists row:', artists[0]);
-
-        const tracks: Track[] = parseCSVFile(tracksFilePath);
-        logger.trace('Example tracks row:', tracks[0]);
-
-        const filteredTracks = filterTracks(tracks);
-
-        const filteredArtists = filterArtists(artists, filteredTracks);
-
-        const transformedFilteredTracks = transformTracks(filteredTracks);
-
-        uploadAsCSVFileToS3(transformedFilteredTracks, 'transformedTracks.csv');
-        uploadAsCSVFileToS3(filteredArtists, 'transformedArtists.csv');
-    } catch (err) {
-        logger.error(err);
-    }
-}
-
-main();
 
 // test nr 1: test if has no name for example
 // test nr 2: proper duration filtering

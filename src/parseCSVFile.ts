@@ -1,10 +1,10 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import logger from './logger';
 import { parse } from 'csv-parse/sync';
 
-function parseCSVFile(filePath: string) {
-    const file = fs.readFileSync(filePath, 'utf8');
-    logger.debug('Path:', filePath, 'Length:', file.length);
+async function parseCSVFile(filePath: string) {
+    const file = await fs.readFile(filePath, 'utf8');
+    logger.info('Parsing file:', filePath, 'File length:', file.length);
 
     return parse(file, {
         trim: false,
