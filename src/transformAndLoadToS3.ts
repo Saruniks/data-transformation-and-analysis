@@ -1,17 +1,21 @@
 import logger from './logger';
-import { parseCSVFile } from './parseCSVFile';
+import { parseCSVBuffer } from './parseCSVBuffer';
 import { uploadAsCSVFileToS3 } from './uploadToS3';
-import { downloadSpotifyDataset } from './downloadFromKaggle';
+import { downloadAndExtractDataset } from './downloadFromKaggle';
 import { filterArtists, filterTracks, transformTracks } from './transform';
 
 async function main() {
-    let tmpFiles;
     try {
-        tmpFiles = await downloadSpotifyDataset();
-        
+        const files = await downloadAndExtractDataset('yamaerenay/spotify-dataset-19212020-600k-tracks');
+
+        if (!files['artists.csv'] || !files['tracks.csv']) {
+            throw new Error("Required CSV files (artists.csv and tracks.csv) not found in the dataset.");
+        }
+
+        // Parse the CSV buffers concurrently
         const [artists, tracks] = await Promise.all([
-            parseCSVFile(`${tmpFiles.name}/artists.csv`),
-            parseCSVFile(`${tmpFiles.name}/tracks.csv`)
+            parseCSVBuffer(files['artists.csv']),
+            parseCSVBuffer(files['tracks.csv'])
         ]);
 
         logger.trace('Example artists row:', artists[0]);
@@ -23,17 +27,14 @@ async function main() {
         const transformedFilteredTracks = transformTracks(filteredTracks);
 
         logger.info('Uploading data to S3...');
-        
         await Promise.all([
             uploadAsCSVFileToS3(transformedFilteredTracks, 'transformedTracks.csv'),
             uploadAsCSVFileToS3(filteredArtists, 'transformedArtists.csv')
         ]);
 
-        logger.info('Data uploaded to S3 successfully');
+        logger.info('Data uploaded to S3 successfully!');
     } catch (err) {
         logger.error(err);
-    } finally {
-        tmpFiles?.removeCallback();
     }
 }
 

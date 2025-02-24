@@ -1,12 +1,10 @@
-import fs from 'fs';
 import axios from 'axios';
 import AdmZip from 'adm-zip';
-import tmp, { DirResult } from 'tmp';
 
 import logger from './logger';
 import { env } from './env';
 
-async function downloadDataset(dataset: string) {
+export async function downloadAndExtractDataset(dataset: string): Promise<Record<string, Buffer>> {
     const url = `https://www.kaggle.com/api/v1/datasets/download/${dataset}`;
     const auth = Buffer.from(`${env.KAGGLE_USERNAME}:${env.KAGGLE_KEY}`).toString('base64');
 
@@ -16,22 +14,18 @@ async function downloadDataset(dataset: string) {
         headers: { Authorization: `Basic ${auth}` },
     });
 
-    const tmpFile = tmp.fileSync({ keep: false });
-    fs.writeFileSync(tmpFile.name, response.data);
-    logger.info('Dataset downloaded successfully.');
-    return tmpFile;
-}
+    logger.info('Download completed. Extracting...');
 
-function extractCSVFiles(tmpFile: tmp.FileResult): DirResult {
-    logger.info('Extracting CSV files...');
-    const tmpDir = tmp.dirSync({ unsafeCleanup: true });
-    const zip = new AdmZip(tmpFile.name);
-    zip.extractAllTo(tmpDir.name, true);
+    const zip = new AdmZip(response.data);
+    const entries = zip.getEntries();
 
-    return tmpDir;
-}
+    const files: Record<string, Buffer> = {};
+    for (const entry of entries) {
+        if (!entry.isDirectory) {
+            files[entry.entryName] = entry.getData();
+        }
+    }
 
-export async function downloadSpotifyDataset(): Promise<DirResult> {
-    const dataset = await downloadDataset('yamaerenay/spotify-dataset-19212020-600k-tracks');
-    return await extractCSVFiles(dataset);
+    logger.info('Dataset extracted in memory');
+    return files;
 }
