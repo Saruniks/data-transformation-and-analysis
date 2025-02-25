@@ -1,8 +1,8 @@
 import axios from 'axios';
 import AdmZip from 'adm-zip';
 
-import logger from './logger';
-import { env } from './env';
+import logger from '../logger';
+import { env } from '../env';
 
 export async function downloadAndExtractDataset(dataset: string): Promise<Record<string, Buffer>> {
     const url = `https://www.kaggle.com/api/v1/datasets/download/${dataset}`;

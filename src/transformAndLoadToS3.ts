@@ -1,8 +1,8 @@
 import logger from './logger';
-import { parseCSVBuffer } from './parseCSVBuffer';
-import { uploadAsCSVFileToS3 } from './uploadToS3';
-import { downloadAndExtractDataset } from './downloadFromKaggle';
-import { filterArtists, filterTracks, transformTracks } from './transform';
+import { parseCSVBuffer } from './csv-parse/parse';
+import { uploadAsCSVFileToS3 } from './s3/filesTransfer';
+import { downloadAndExtractDataset } from './kaggle/download';
+import { filterArtists, filterTracks, transformTracks } from './transform/transform';
 
 async function main() {
     try {

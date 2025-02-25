@@ -2,7 +2,13 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredEnvVars = ['AWS_REGION', 'S3_BUCKET_NAME', 'KAGGLE_USERNAME', 'KAGGLE_KEY'] as const;
+const requiredEnvVars = [
+    'AWS_REGION',
+    'S3_BUCKET_NAME',
+    'KAGGLE_USERNAME',
+    'KAGGLE_KEY',
+    'PG_CONNECTION_URL'
+] as const;
 
 requiredEnvVars.forEach((varName) => {
     if (!process.env[varName]) {
@@ -15,4 +21,5 @@ export const env = {
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME as string,
     KAGGLE_USERNAME: process.env.KAGGLE_USERNAME as string,
     KAGGLE_KEY: process.env.KAGGLE_KEY as string,
+    PG_CONNECTION_URL: process.env.PG_CONNECTION_URL as string,
 };
