@@ -15,10 +15,10 @@ This project uses a `.env` file for configuration. Copy the provided [.env.sampl
 
 ## Prerequisites
 
-Before running the project, ensure you have the following installed and configured:
+Before running the project, ensure you have the following installed and configured locally:
 
-- **PostgreSQL & psql:** Installed locally.
-- **AWS credentials:** Configured on your local machine.
+- **PostgreSQL & psql**
+- **AWS credentials**
 
 ## How to Run
 
@@ -30,12 +30,12 @@ Run the following command to transform your data and load it to S3:
 
 ### Load Data from S3 to PostgreSQL
 
-After data is in S3, load it into your PostgreSQL database by running:
+After data is in S3, load it into your PostgreSQL database and create materialized views by running:
 
     npx ts-node src/loadFromS3ToPostgres.ts
 
-## Running Tests
+## Tests
 
-To run the tests for this project, execute:
+To run the tests:
 
     npm test
