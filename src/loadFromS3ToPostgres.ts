@@ -66,7 +66,7 @@ async function main() {
                     .readFileSync(file)
                     .toString();
 
-                logger.info("Creating SQL view...");
+                logger.info("Creating materialized SQL view...");
 
                 await pgClient.query(viewQuery);
             })
